@@ -8,10 +8,9 @@ ACreatures::ACreatures()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 0.5f;
 
-	SceneComponent = CreateDefaultSubobject<USceneComponent>("Default Scene");
-	RootComponent = SceneComponent;
+	/*SceneComponent = CreateDefaultSubobject<USceneComponent>("Default Scene");
+	RootComponent = SceneComponent;*/
 }
 
 // Called when the game starts or when spawned
@@ -22,6 +21,9 @@ void ACreatures::BeginPlay()
 	IsCreated = false;
 	
 	CreateCreature();
+
+	FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &ACreatures::RandomMove);
+	GetWorld()->GetTimerManager().SetTimer(RotTargetUpdate, Delegate, 0.5f, true, 0.f);
 }
 
 // Called every frame
@@ -31,7 +33,12 @@ void ACreatures::Tick(float DeltaTime)
 
 	if (!IsCreated) return;
 
-	RandomMove();
+	for (int jointID = Joints.Num() - 1; jointID >= 0; jointID--) {
+		FJoint joint = Joints[jointID];
+		FQuat newRot = FMath::Lerp(FQuat(CreatureMesh[joint.Slave]->GetRelativeRotation()), FQuat(joint.TargetRotation), 0.05f);
+		
+		CreatureMesh[joint.Slave]->SetRelativeRotation(newRot, true);
+	}
 }
 
 // Create a creature randomly
@@ -50,52 +57,43 @@ void ACreatures::CreateCreature()
 		
 		CreatureMesh.Emplace(CurrentMesh);
 		
-		if (!CreatureMesh[CurrentIndex]) continue;
+		if (!CurrentMesh) continue;
 
-		CreatureMesh[CurrentIndex]->RegisterComponent();
+		CurrentMesh->RegisterComponent();
+
+		CurrentMesh->SetUseCCD(true);
+		CurrentMesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+		CurrentMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 		if (!CurrentIndex) {
+			//RootComponent = CurrentMesh;
 			CreatureMesh[CurrentIndex]->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-			CreatureMesh[CurrentIndex]->SetSimulatePhysics(true);
+			CurrentMesh->SetSimulatePhysics(true);
 		}
 		else {
-			CreatureMesh[CurrentIndex]->AddRelativeLocation(FVector(-100, 0, 0));
-			CreatureMesh[CurrentIndex]->SetRelativeScale3D(FVector(1, PrevBody->GetRelativeScale3D()[1] * 0.98f, PrevBody->GetRelativeScale3D()[2] * 0.98f));
-			CreatureMesh[CurrentIndex]->AttachToComponent(PrevBody, FAttachmentTransformRules::KeepRelativeTransform);
+			CurrentMesh->AddRelativeLocation(FVector(-SegmentSize, 0, 0));
+			CurrentMesh->SetRelativeScale3D(FVector(1, PrevBody->GetRelativeScale3D()[1] * 0.98f, PrevBody->GetRelativeScale3D()[2] * 0.98f));
+			CurrentMesh->AttachToComponent(PrevBody, FAttachmentTransformRules::KeepRelativeTransform);
 
 			FJoint joint;
 			joint.Master = PrevBodyID;
 			joint.Slave = CurrentIndex;
-			joint.Position = CreatureMesh[CurrentIndex]->GetRelativeLocation();
+			joint.Position = CurrentMesh->GetRelativeLocation();
+			joint.Rotation = CurrentMesh->GetRelativeRotation();
+			joint.TargetRotation = CurrentMesh->GetRelativeRotation();
 			joint.LimitAngle = FVector(80, 25, 25);
 
 			Joints.Emplace(joint);
 		}
 
-		CreatureMesh[CurrentIndex]->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		CurrentMesh->CreationMethod = EComponentCreationMethod::Instance;
 
 		if (!Shape) continue;
 
-		CreatureMesh[CurrentIndex]->SetStaticMesh(Shape);
+		CurrentMesh->SetStaticMesh(Shape);
 
-		int LimbCount = FMath::RandRange(MinNbLimbs, MaxNbLimbs);
-		
 		CurrentIndex++;
 		PrevBody = CurrentMesh;
-		/*for (int limbID = 0; limbID < LimbCount; limbID++) {
-			CreatureMesh[CurrentIndex] = CreateDefaultSubobject<UStaticMeshComponent>("Limb");
-			CreatureMesh[CurrentIndex]->SetStaticMesh(Shape);
-			CreatureMesh[CurrentIndex]->SetRelativeScale3D(
-				FVector(
-					FMath::FRandRange(0.1f, 1.f),
-					FMath::FRandRange(0.1f, 1.f),
-					FMath::FRandRange(0.1f, 1.f)
-				));
-
-			CreatureMesh[CurrentIndex]->SetupAttachment(CreatureMesh[PrevBodyID]);
-
-			CurrentIndex++;
-		}*/
 	}
 
 	IsCreated = true;
@@ -106,9 +104,9 @@ void ACreatures::RandomMove()
 {
 	for (int jointID = 0; jointID < Joints.Num(); jointID++) {
 		FJoint joint = Joints[jointID];
-		float angleX = FMath::FRandRange(-0.5f, 0.5f);
-		float angleY = FMath::FRandRange(-0.5f, 0.5f);
-		float angleZ = FMath::FRandRange(-0.5f, 0.5f);
+		float angleX = FMath::FRandRange(-10.f, 10.f);
+		float angleY = FMath::FRandRange(-10.f, 10.f);
+		float angleZ = FMath::FRandRange(-10.f, 10.f);
 
 		FRotator angle = CreatureMesh[joint.Slave]->GetRelativeRotation() + FRotator(angleX, angleY, angleZ);
 		angle = FRotator(
@@ -117,7 +115,7 @@ void ACreatures::RandomMove()
 			FMath::Clamp(angle.Yaw, -joint.LimitAngle[2], joint.LimitAngle[2])
 		);
 
-		CreatureMesh[joint.Slave]->SetRelativeRotation(FQuat(angle));
+		Joints[jointID].TargetRotation = angle;
 	}
 }
 

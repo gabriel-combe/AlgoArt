@@ -14,6 +14,14 @@ struct FJoint {
 	UPROPERTY(BlueprintReadWrite, Category = "Joint")
 	FVector Position;
 
+	// Joint Rotation
+	UPROPERTY(BlueprintReadWrite, Category = "Joint")
+	FRotator Rotation;
+
+	// Joint Target Rotation
+	UPROPERTY(BlueprintReadWrite, Category = "Joint")
+	FRotator TargetRotation;
+
 	// Joint Angle Limit
 	UPROPERTY(BlueprintReadWrite, Category = "Joint")
 	FVector LimitAngle;
@@ -35,6 +43,9 @@ class ALGOART_API ACreatures : public AActor
 private:	
 	//NeuralNetwork Brain;
 
+	// Timer Handle for target orientation update
+	FTimerHandle RotTargetUpdate;
+
 	// Root Scene
 	UPROPERTY(VisibleAnywhere, Category = "Creatures")
 	TObjectPtr<USceneComponent> SceneComponent;
@@ -53,15 +64,11 @@ private:
 
 	// Maximum number of Body
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Creatures", meta = (AllowPrivateAccess = "true"))
-	int MaxNbBody = 5;
-
-	// Minimum number of Limb
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Creatures", meta = (AllowPrivateAccess = "true"))
-	int MinNbLimbs = 2;
+	int MaxNbBody = 8;
 
 	// Maximum number of Limb
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Creatures", meta = (AllowPrivateAccess = "true"))
-	int MaxNbLimbs = 4;
+	float SegmentSize = 100;
 
 	// Is the creature created
 	bool IsCreated = false;
