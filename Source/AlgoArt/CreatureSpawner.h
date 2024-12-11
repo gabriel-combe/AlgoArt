@@ -17,6 +17,14 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACreatures> CreatureActor;
 
+	// Target Point for all the Creatures
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
+	FVector TargetPoint;
+
+	//Number of Creatures
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
+	int NumberCreature = 10;
+
 	// List of creatures
 	TArray<ACreatures*> CreaturesArray;
 
@@ -34,5 +42,9 @@ public:
 	// Spawn Creatures
 	UFUNCTION(BlueprintCallable, Category = "Spawner")
 	void SpawnCreature();
+
+	// Resample Creatures
+
+	// 
 
 };

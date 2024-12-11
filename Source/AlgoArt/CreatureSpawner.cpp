@@ -31,9 +31,21 @@ void ACreatureSpawner::SpawnCreature()
 {
 	if (!CreatureActor) return;
 
-	for (int index = 0; index < 5; index++) {
-		ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(FMath::FRandRange(0.f, 360.f)), FVector(FMath::FRandRange(0.f, 10000.f), FMath::FRandRange(0.f, 10000.f), 500.f), FVector::OneVector));
-		CreaturesArray.Emplace(creature);
+	if (CreaturesArray.IsEmpty()) {
+		for (int index = 0; index < NumberCreature; index++) {
+			float angle = FMath::FRandRange(0.f, 2 * PI);
+			ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(0.f, 0.f, FMath::RadiansToDegrees(angle + 180.f)), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
+			creature->SetTargetPoint(TargetPoint);
+			CreaturesArray.Emplace(creature);
+		}
+		return;
 	}
+
+	/*for (int index = 0; index < NumberCreature; index++) {
+		float angle = FMath::FRandRange(0.f, 2 * PI);
+		ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(0.f, 0.f, FMath::RadiansToDegrees(angle + 180.f)), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
+		creature->SetTargetPoint(TargetPoint);
+		CreaturesArray.Emplace(creature);
+	}*/
 }
 

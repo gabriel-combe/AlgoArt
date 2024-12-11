@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NeuralNetworkModel.h"
 #include "GameFramework/Actor.h"
 #include "Creatures.generated.h"
 
@@ -41,10 +42,17 @@ class ALGOART_API ACreatures : public AActor
 	GENERATED_BODY()
 	
 private:	
-	//NeuralNetwork Brain;
+	// Brain of the creature
+	UNeuralNetworkModel Brain;
 
 	// Timer Handle for target orientation update
 	FTimerHandle RotTargetUpdate;
+
+	// Target Point in the World
+	FVector TargetPoint;
+
+	// Random Period
+	float RandPeriod = FMath::FRandRange(1.f, 10.f);
 
 	// Root Scene
 	UPROPERTY(VisibleAnywhere, Category = "Creatures")
@@ -92,9 +100,21 @@ public:
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void CreateCreature();
 
+	// Set the Target Point of the Creature
+	UFUNCTION(BlueprintCallable, Category = "Creature")
+	void SetTargetPoint(FVector targetpoint);
+
 	// Random Move
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void RandomMove();
+
+	// Setup the Brain
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
+	void SetupBrain();
+
+	// Use the Brain
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
+	void UseBrain();
 
 	// Clear the creature
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creature")
