@@ -72,25 +72,3 @@ void UNeuralNetworkModel::SetHiddenLayers(TArray<int>& hiddenlayers)
 {
 	HiddenLayers = hiddenlayers;
 }
-
-// Mutate the Neural Network
-void UNeuralNetworkModel::Mutate(float mutationrate)
-{
-	for (int k = 0; k < Weights.Num(); k++) {
-		for (int row = 0; row < Weights[k].GetRows(); row++) {
-			for (int col = 0; col < Weights[k].GetColumns(); col++) {
-				if (FMath::FRand() >= mutationrate) continue;
-
-				Weights[k].SetValue(row, col, FMath::Clamp(Weights[k].GetValue(row, col) + FMath::FRand() - 0.5f, -1.f, 1.f));
-			}
-		}
-	}
-
-	for (int k = 0; k < Bias.Num(); k++) {
-		for (int col = 0; col < Bias[k].GetColumns(); col++) {
-			if (FMath::FRand() >= mutationrate) continue;
-
-			Weights[k].SetValue(0, col, FMath::Clamp(Weights[k].GetValue(0, col) + FMath::FRand() - 0.5f, -1.f, 1.f));
-		}
-	}
-}

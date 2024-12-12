@@ -104,15 +104,15 @@ void ACreatures::CreateCreature()
 // Setup the Brain
 void ACreatures::SetupBrain()
 {
-	Brain->SetInputsNumber(5 + 3 * Joints.Num());
-	Brain->SetOutputsNumber(3 * Joints.Num());
+	Brain.SetInputsNumber(5 + 3 * Joints.Num());
+	Brain.SetOutputsNumber(3 * Joints.Num());
 	TArray<int> HiddenLayers;
 	HiddenLayers.Emplace(2 * (5 + 3 * Joints.Num()));
 	HiddenLayers.Emplace(4 + 3 * Joints.Num());
 	HiddenLayers.Emplace(int(0.5f * (5 + 3 * Joints.Num())));
-	Brain->SetHiddenLayers(HiddenLayers);
+	Brain.SetHiddenLayers(HiddenLayers);
 
-	Brain->InitModel();
+	Brain.InitModel();
 }
 
 // Set the Target Point of the Creature
@@ -159,7 +159,7 @@ void ACreatures::UseBrain()
 		Input.SetValue(0, index + 1, FMath::Fmod(Joints[(index - 5) / 3].Rotation.Yaw, 360.f) / 360.f);
 	}
 
-	FMatrixNN Output = Brain->RunForwardModel(Input);
+	FMatrixNN Output = Brain.RunForwardModel(Input);
 	// UE_LOG(LogTemp, Warning, TEXT("Output Size %d x %d"), Output.GetRows(), Output.GetColumns());
 
 	for (int index = 0; index < Output.GetColumns(); index = index + 3) {
@@ -180,18 +180,6 @@ void ACreatures::UseBrain()
 
 		Joints[index / 3].TargetRotation = NewJointRot;
 	}
-}
-
-// Set the brain of the creature
-void ACreatures::SetBrain(UNeuralNetworkModel* brain)
-{
-	Brain = brain;
-}
-
-// Apply mutation to the brain
-void ACreatures::BrainMutation(float mutationrate)
-{
-	Brain->Mutate(mutationrate);
 }
 
 // Clear the creature

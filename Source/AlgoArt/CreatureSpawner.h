@@ -13,9 +13,6 @@ class ALGOART_API ACreatureSpawner : public AActor
 	GENERATED_BODY()
 	
 private:	
-	// Timer Handle for Creature resample
-	FTimerHandle TimerHandleResample;
-
 	// Actor class to spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACreatures> CreatureActor;
@@ -30,9 +27,6 @@ private:
 
 	// List of creatures
 	TArray<ACreatures*> CreaturesArray;
-
-	// List of Resampled Creature
-	TArray<ACreatures*> ResampleCreature;
 
 protected:
 	// Called when the game starts or when spawned
@@ -50,10 +44,7 @@ public:
 	void SpawnCreature();
 
 	// Resample Creatures
-	UFUNCTION(BlueprintCallable, Category = "Spawner")
-	void CreatureResampling();
 
-	// Mutation of the Creatures
-	UFUNCTION(BlueprintCallable, Category = "Spawner")
-	void CreatureMutation();
+	// 
+
 };

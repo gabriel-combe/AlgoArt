@@ -43,7 +43,7 @@ class ALGOART_API ACreatures : public AActor
 	
 private:	
 	// Brain of the creature
-	UNeuralNetworkModel* Brain;
+	UNeuralNetworkModel Brain;
 
 	// Timer Handle for target orientation update
 	FTimerHandle RotTargetUpdate;
@@ -57,6 +57,10 @@ private:
 	// Root Scene
 	UPROPERTY(VisibleAnywhere, Category = "Creatures")
 	TObjectPtr<USceneComponent> SceneComponent;
+
+	// Array of meshes for the creature 
+	UPROPERTY(VisibleAnywhere, Category = "Creatures")
+	TArray<UStaticMeshComponent*> CreatureMesh;
 
 	// Mesh to use for the creature
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Creatures", meta = (AllowPrivateAccess = "true"))
@@ -88,10 +92,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Array of meshes for the creature 
-	UPROPERTY(VisibleAnywhere, Category = "Creatures")
-	TArray<UStaticMeshComponent*> CreatureMesh;
-
 	// Array of joint
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Creatures")
 	TArray<FJoint> Joints;
@@ -115,16 +115,6 @@ public:
 	// Use the Brain
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void UseBrain();
-
-	// Set the brain of the creature
-	void SetBrain(UNeuralNetworkModel* brain);
-
-	// Get the brain of the creature
-	UNeuralNetworkModel* GetBrain() const { return Brain; };
-
-	// Apply mutation to the brain
-	UFUNCTION(BlueprintCallable, Category = "Creatures")
-	void BrainMutation(float mutationrate);
 
 	// Clear the creature
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creature")
