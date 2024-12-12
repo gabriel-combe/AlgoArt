@@ -34,7 +34,7 @@ void ACreatureSpawner::SpawnCreature()
 	if (CreaturesArray.IsEmpty()) {
 		for (int index = 0; index < NumberCreature; index++) {
 			float angle = FMath::FRandRange(0.f, 2 * PI);
-			ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(0.f, 0.f, FMath::RadiansToDegrees(angle + 180.f)), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
+			ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(0.f, 0.f, FMath::RadiansToDegrees(angle + PI)), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
 			creature->SetTargetPoint(TargetPoint);
 			CreaturesArray.Emplace(creature);
 		}
