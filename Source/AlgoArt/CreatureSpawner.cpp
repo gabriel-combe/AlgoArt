@@ -16,7 +16,12 @@ void ACreatureSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnCreature();	
+	ResamplingNumber = int(NumberCreature * ResamplingRatio);
+
+	SpawnCreature();
+
+	FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &ACreatureSpawner::CreatureResampling);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleResampling, Delegate, 10.f, true, -10.f);
 }
 
 // Called every frame
@@ -34,18 +39,47 @@ void ACreatureSpawner::SpawnCreature()
 	if (CreaturesArray.IsEmpty()) {
 		for (int index = 0; index < NumberCreature; index++) {
 			float angle = FMath::FRandRange(0.f, 2 * PI);
-			ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(0.f, 0.f, FMath::RadiansToDegrees(angle + PI)), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
-			creature->SetTargetPoint(TargetPoint);
+			ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(0.f, FMath::RadiansToDegrees(angle + PI), 0.f), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
+			creature->CreateRandomCreature();
+			creature->SetupBrain();
+			creature->ActivateBrain();
 			CreaturesArray.Emplace(creature);
 		}
 		return;
 	}
 
-	/*for (int index = 0; index < NumberCreature; index++) {
+	for (int index = 0; index < ResamplingNumber; index++) {
 		float angle = FMath::FRandRange(0.f, 2 * PI);
-		ACreatures* creature = GetWorld()->SpawnActor<ACreatures>(CreatureActor, FTransform(FRotator(0.f, 0.f, FMath::RadiansToDegrees(angle + 180.f)), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
-		creature->SetTargetPoint(TargetPoint);
-		CreaturesArray.Emplace(creature);
-	}*/
+		CreaturesArray[index]->CreatureMesh[0]->ResetRelativeTransform();
+		CreaturesArray[index]->SetActorRelativeTransform(FTransform(FRotator(0.f, FMath::RadiansToDegrees(angle + PI), 0.f), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
+	}
+
+	for (int index = ResamplingNumber; index < NumberCreature; index++) {
+		float angle = FMath::FRandRange(0.f, 2 * PI);
+		CreaturesArray[index]->CreatureMesh[0]->ResetRelativeTransform();
+		CreaturesArray[index]->CreateCopyCreature(CreaturesArray[index % ResamplingNumber]);
+		CreaturesArray[index]->ActivateBrain();
+		CreaturesArray[index]->SetActorRelativeTransform(FTransform(FRotator(0.f, FMath::RadiansToDegrees(angle + PI), 0.f), FVector(FMath::Cos(angle) * 8000.f, FMath::Sin(angle) * 8000.f, 200.f), FVector::OneVector));
+	}
+}
+
+// Resample Creatures
+void ACreatureSpawner::CreatureResampling()
+{
+	CreaturesArray.Sort([](const ACreatures& ip1, const ACreatures& ip2) {
+		return ip1.CreatureMesh[0]->GetRelativeLocation().Length() > ip2.CreatureMesh[0]->GetRelativeLocation().Length();
+	});
+
+	SpawnCreature();
+
+	CreatureMutation();
+}
+
+// Mutate the creatures
+void ACreatureSpawner::CreatureMutation()
+{
+	for (int index = ResamplingNumber; index < NumberCreature; index++) {
+		CreaturesArray[index]->MutateCreature(MutationRate);
+	}
 }
 

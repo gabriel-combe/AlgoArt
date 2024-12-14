@@ -13,17 +13,31 @@ class ALGOART_API ACreatureSpawner : public AActor
 	GENERATED_BODY()
 	
 private:	
+	// Mutation Rate of the Creature
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
+	float MutationRate = 0.1f;
+
 	// Actor class to spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACreatures> CreatureActor;
 
 	// Target Point for all the Creatures
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
-	FVector TargetPoint;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
+	// FVector TargetPoint;
 
 	//Number of Creatures
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
 	int NumberCreature = 10;
+
+	// Resampling ratio (creature to keep)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
+	float ResamplingRatio = 0.2f;
+
+	// Timer Handle for the resampling
+	FTimerHandle TimerHandleResampling;
+
+	// Resampling number in the array
+	int ResamplingNumber;
 
 	// List of creatures
 	TArray<ACreatures*> CreaturesArray;
@@ -44,7 +58,11 @@ public:
 	void SpawnCreature();
 
 	// Resample Creatures
+	UFUNCTION(BlueprintCallable, Category = "Spawner")
+	void CreatureResampling();
 
-	// 
+	// Mutate the creatures
+	UFUNCTION(BlueprintCallable, Category = "Spawner")
+	void CreatureMutation();
 
 };

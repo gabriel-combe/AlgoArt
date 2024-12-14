@@ -49,7 +49,10 @@ private:
 	FTimerHandle RotTargetUpdate;
 
 	// Target Point in the World
-	FVector TargetPoint;
+	FVector TargetPoint = FVector::Zero();
+
+	// Number of Body Parts
+	int BodyCount = 2;
 
 	// Random Period
 	float RandPeriod = FMath::FRandRange(1.f, 10.f);
@@ -57,10 +60,6 @@ private:
 	// Root Scene
 	UPROPERTY(VisibleAnywhere, Category = "Creatures")
 	TObjectPtr<USceneComponent> SceneComponent;
-
-	// Array of meshes for the creature 
-	UPROPERTY(VisibleAnywhere, Category = "Creatures")
-	TArray<UStaticMeshComponent*> CreatureMesh;
 
 	// Mesh to use for the creature
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Creatures", meta = (AllowPrivateAccess = "true"))
@@ -92,13 +91,23 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Array of meshes for the creature 
+	UPROPERTY(VisibleAnywhere, Category = "Creatures")
+	TArray<UStaticMeshComponent*> CreatureMesh;
+
 	// Array of joint
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Creatures")
 	TArray<FJoint> Joints;
 
-	// Create a creature randomly
+	// Create a creature
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void CreateCreature();
+
+	// Create a creature from an existing one
+	void CreateCopyCreature(ACreatures* source);
+
+	// Create a creature randomly
+	void CreateRandomCreature();
 
 	// Set the Target Point of the Creature
 	UFUNCTION(BlueprintCallable, Category = "Creature")
@@ -115,6 +124,18 @@ public:
 	// Use the Brain
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void UseBrain();
+
+	// Activate the Brain
+	UFUNCTION(BlueprintCallable, Category = "Creatures")
+	void ActivateBrain();
+
+	// Deactivate the Brain
+	UFUNCTION(BlueprintCallable, Category = "Creatures")
+	void DeactivateBrain();
+
+	// Mutate the creature
+	UFUNCTION(BlueprintCallable, Category = "Creatures")
+	void MutateCreature(float mutationrate);
 
 	// Clear the creature
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creature")

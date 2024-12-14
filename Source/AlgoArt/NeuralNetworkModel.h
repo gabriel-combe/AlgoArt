@@ -317,4 +317,10 @@ public:
 
 	// Run a Forward pass of the Neural Network Model and output the result
 	FMatrixNN RunForwardModel(FMatrixNN Input);
+
+	// Copy a Neural Network Model
+	void CopyNeuralNetwork(UNeuralNetworkModel* source);
+
+	// Mutate the Neural Network
+	void MutateNeuralNetwork(float mutationrate);
 };

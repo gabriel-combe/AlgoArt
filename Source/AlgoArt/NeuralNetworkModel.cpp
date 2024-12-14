@@ -72,3 +72,43 @@ void UNeuralNetworkModel::SetHiddenLayers(TArray<int>& hiddenlayers)
 {
 	HiddenLayers = hiddenlayers;
 }
+
+// Copy a Neural Network Model
+void UNeuralNetworkModel::CopyNeuralNetwork(UNeuralNetworkModel* source)
+{
+	InputsNumber = source->InputsNumber;
+	OutputsNumber = source->OutputsNumber;
+	HiddenLayers = source->HiddenLayers;
+
+	// Clear any previous weights and bias
+	Weights.Empty();
+	Bias.Empty();
+
+	for (int k = 0; k < source->Weights.Num(); k++) {
+		FMatrixNN weight = source->Weights[k];
+		FMatrixNN bias = source->Bias[k];
+
+		Weights.Push(weight);
+		Bias.Push(bias);
+	}
+}
+
+// Mutate the Neural Network
+void UNeuralNetworkModel::MutateNeuralNetwork(float mutationrate)
+{
+	for (int k = 0; k < Weights.Num(); k++) {
+		for (int row = 0; row < Weights[k].GetRows(); row++) {
+			for (int col = 0; col < Weights[k].GetColumns(); col++) {
+				if (FMath::FRand() >= mutationrate) continue;
+
+				Weights[k].SetValue(row, col, FMath::FRandRange(-1.f, 1.f));
+			}
+		}
+
+		for (int col = 0; col < Bias[k].GetColumns(); col++) {
+			if (FMath::FRand() >= mutationrate) continue;
+
+			Bias[k].SetValue(0, col, FMath::FRandRange(-1.f, 1.f));
+		}
+	}
+}

@@ -17,15 +17,6 @@ ACreatures::ACreatures()
 void ACreatures::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	IsCreated = false;
-	
-	CreateCreature();
-
-	SetupBrain();	
-
-	FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &ACreatures::UseBrain);
-	GetWorld()->GetTimerManager().SetTimer(RotTargetUpdate, Delegate, 0.5f, true, 0.f);
 }
 
 // Called every frame
@@ -51,7 +42,6 @@ void ACreatures::CreateCreature()
 	int CurrentIndex = 0;
 	int PrevBodyID = 0;
 	TObjectPtr<UStaticMeshComponent> PrevBody;
-	int BodyCount = FMath::RandRange(MinNbBody, MaxNbBody);
 
 	for (int bodyID = 0; bodyID < BodyCount; bodyID++) {
 		TObjectPtr<UStaticMeshComponent> CurrentMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), FName(FString::Printf(TEXT("Body%d"), bodyID)));
@@ -99,6 +89,40 @@ void ACreatures::CreateCreature()
 	}
 
 	IsCreated = true;
+}
+
+// Create a creature from an existing one
+void ACreatures::CreateCopyCreature(ACreatures* source)
+{
+	DeactivateBrain();
+
+	IsCreated = false;
+	
+	BodyCount = source->BodyCount;
+
+	CreateCreature();
+
+	for (int i = 0; i < Joints.Num(); i++) {
+		Joints[i].LimitAngle = source->Joints[i].LimitAngle;
+	}
+
+	Brain = source->Brain;
+
+	TargetPoint = source->TargetPoint;
+
+	RandPeriod = source->RandPeriod;
+}
+
+// Create a creature randomly
+void ACreatures::CreateRandomCreature()
+{
+	DeactivateBrain();
+
+	IsCreated = false;
+
+	BodyCount = FMath::RandRange(MinNbBody, MaxNbBody);
+
+	CreateCreature();
 }
 
 // Setup the Brain
@@ -180,6 +204,25 @@ void ACreatures::UseBrain()
 
 		Joints[index / 3].TargetRotation = NewJointRot;
 	}
+}
+
+// Activate the Brain
+void ACreatures::ActivateBrain()
+{
+	FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &ACreatures::UseBrain);
+	GetWorld()->GetTimerManager().SetTimer(RotTargetUpdate, Delegate, 0.5f, true, 0.f);
+}
+
+// Deactivate the Brain
+void ACreatures::DeactivateBrain()
+{
+	GetWorld()->GetTimerManager().ClearTimer(RotTargetUpdate);
+}
+
+// Mutate the creature
+void ACreatures::MutateCreature(float mutationrate)
+{
+	Brain.MutateNeuralNetwork(mutationrate);
 }
 
 // Clear the creature
