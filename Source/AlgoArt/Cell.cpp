@@ -7,19 +7,25 @@
 ACell::ACell()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+
+	// Create scene root component
+	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+	SetRootComponent(DefaultSceneRoot);
 
 	CellMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cell Mesh"));
-	RootComponent = CellMesh;
-
-	Material = CellMesh->GetMaterial(0);
-	DynMaterial = UMaterialInstanceDynamic::Create(Material, NULL);
+	CellMesh->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void ACell::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!CellMesh) return;
+
+	DynMaterial = UMaterialInstanceDynamic::Create(CellMesh->GetMaterial(0), CellMesh);
+	CellMesh->SetMaterial(0, DynMaterial);
 }
 
 // Called every frame
@@ -37,15 +43,16 @@ void ACell::SetInitState(bool state)
 
 	FVector Scale = GetActorScale3D();
 
-	ChangeColour(FVector(State));
+	ChangeColour(State);
 	SetActorScale3D(FVector(Scale.X, Scale.Y, 5 * State + 1));
 }
 
 // Called to change colour
-void ACell::ChangeColour(FVector colour)
+void ACell::ChangeColour(float colour)
 {
-	DynMaterial->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(colour));
-	CellMesh->SetMaterial(0, DynMaterial);
+	if (!DynMaterial || !CellMesh) return;
+
+	DynMaterial->SetScalarParameterValue(FName("Color"), colour);
 }
 
 // Called to save the current state
@@ -62,5 +69,5 @@ void ACell::NewState(bool state)
 	FVector Scale = GetActorScale3D();
 
 	SetActorScale3D(FVector(Scale.X, Scale.Y, 5*State + 1));
-	ChangeColour(FVector(State));
+	ChangeColour(State);
 }

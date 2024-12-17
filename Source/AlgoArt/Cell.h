@@ -12,12 +12,12 @@ class ALGOART_API ACell : public AActor
 	GENERATED_BODY()
 	
 private:	
+	// Scene Component
+	TObjectPtr<USceneComponent> DefaultSceneRoot;
+
 	// Mesh of the cell
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> CellMesh;
-
-	// Material Interface of the cell mesh
-	TObjectPtr<UMaterialInterface> Material;
 
 	// Dynamic material for the cell mesh
 	TObjectPtr<UMaterialInstanceDynamic> DynMaterial;
@@ -43,7 +43,7 @@ public:
 	void SetInitState(bool state);
 
 	// Called to change colour
-	void ChangeColour(FVector colour);
+	void ChangeColour(float colour);
 
 	// Called to save the current state
 	void SaveState();

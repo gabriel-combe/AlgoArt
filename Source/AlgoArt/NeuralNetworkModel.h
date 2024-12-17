@@ -7,7 +7,7 @@
 
 
 USTRUCT(BlueprintType)
-struct FMatrixNN {
+struct FMatrixNM {
 	GENERATED_BODY()
 
 private:
@@ -22,7 +22,7 @@ private:
 
 public:
 	// Constructor
-	FMatrixNN(int rows = 4, int columns = 4) : Rows(rows), Columns(columns)
+	FMatrixNM(int rows = 4, int columns = 4) : Rows(rows), Columns(columns)
 	{
 		Data.SetNumZeroed(Rows * Columns);
 	}
@@ -84,7 +84,7 @@ public:
 	}
 
 	// Apply the Sigmoid function to the Matrix
-	static FMatrixNN Sigmoid(FMatrixNN& mat)
+	static FMatrixNM Sigmoid(FMatrixNM& mat)
 	{
 		for (int i = 0; i < mat.Data.Num(); i++) {
 			mat.Data[i] = 1 / (1 + FMath::Exp(-mat.Data[i]));
@@ -92,7 +92,7 @@ public:
 	}
 
 	// Apply the Hyperbolic Tangent function to the Matrix
-	static FMatrixNN TanH(FMatrixNN& mat)
+	static FMatrixNM TanH(FMatrixNM& mat)
 	{
 		for (int i = 0; i < mat.Data.Num(); i++) {
 			mat.Data[i] = (FMath::Exp(2 * mat.Data[i]) - 1) / (FMath::Exp(2 * mat.Data[i]) + 1);
@@ -100,7 +100,7 @@ public:
 	}
 
 	// Apply the ReLU function to the Matrix
-	static FMatrixNN ReLU(FMatrixNN& mat)
+	static FMatrixNM ReLU(FMatrixNM& mat)
 	{
 		for (int i = 0; i < mat.Data.Num(); i++) {
 			if (mat.Data[i] < 0.f) mat.Data[i] = 0.f;
@@ -108,7 +108,7 @@ public:
 	}
 
 	// Overload assignement operator
-	void operator=(const FMatrixNN& other)
+	void operator=(const FMatrixNM& other)
 	{
 		Rows = other.Rows;
 		Columns = other.Columns;
@@ -116,14 +116,14 @@ public:
 	}
 
 	// Overload multiplication operator
-	FMatrixNN operator*(const FMatrixNN& other)
+	FMatrixNM operator*(const FMatrixNM& other)
 	{
 		if (Columns != other.Rows) {
 			UE_LOG(LogTemp, Error, TEXT("Invalid Matrix Size, Left Matrix columns should be equal to the Right matrix Rows"));
-			return FMatrixNN(0, 0);
+			return FMatrixNM(0, 0);
 		}
 
-		FMatrixNN Result = FMatrixNN(Rows, other.Columns);
+		FMatrixNM Result = FMatrixNM(Rows, other.Columns);
 
 		for (int row = 0; row < Rows; row++) {
 			for (int col = 0; col < other.Columns; col++) {
@@ -140,9 +140,9 @@ public:
 	}
 
 	// Overload multiplication operator with scalar (left)
-	friend FMatrixNN operator*(const float& scalar, const FMatrixNN& other)
+	friend FMatrixNM operator*(const float& scalar, const FMatrixNM& other)
 	{
-		FMatrixNN Result = FMatrixNN(other.Rows, other.Columns);
+		FMatrixNM Result = FMatrixNM(other.Rows, other.Columns);
 
 		for (int i = 0; i < other.Data.Num(); i++) {
 			Result.Data[i] = other.Data[i] * scalar;
@@ -152,9 +152,9 @@ public:
 	}
 
 	// Overload multiplication operator with scalar (right)
-	FMatrixNN operator*(const float& scalar)
+	FMatrixNM operator*(const float& scalar)
 	{
-		FMatrixNN Result = FMatrixNN(Rows, Columns);
+		FMatrixNM Result = FMatrixNM(Rows, Columns);
 
 		for (int i = 0; i < Data.Num(); i++) {
 			Result.Data[i] = Data[i] * scalar;
@@ -165,11 +165,11 @@ public:
 
 	// Overload addition operator
 	// That function seems so bad that I think I'm going blind just looking at it
-	FMatrixNN operator+(const FMatrixNN& other)
+	FMatrixNM operator+(const FMatrixNM& other)
 	{
 		// Full Matrix
 		if (Rows == other.Rows && Columns == other.Columns) {
-			FMatrixNN Result = FMatrixNN(Rows, Columns);
+			FMatrixNM Result = FMatrixNM(Rows, Columns);
 			for (int i = 0; i < Data.Num(); i++) {
 				Result.Data[i] = Data[i] + other.Data[i];
 			}
@@ -178,7 +178,7 @@ public:
 
 		// Column Matrix
 		if (Rows == other.Rows && other.Columns == 1) {
-			FMatrixNN Result = FMatrixNN(Rows, Columns);
+			FMatrixNM Result = FMatrixNM(Rows, Columns);
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Columns; col++) {
 					Result.SetValue(row, col, GetValue(row, col) + other.GetValue(row, 0));
@@ -188,7 +188,7 @@ public:
 		}
 
 		if (Rows == other.Rows && Columns == 1) {
-			FMatrixNN Result = FMatrixNN(Rows, other.Columns);
+			FMatrixNM Result = FMatrixNM(Rows, other.Columns);
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < other.Columns; col++) {
 					Result.SetValue(row, col, GetValue(row, 0) + other.GetValue(row, col));
@@ -199,7 +199,7 @@ public:
 
 		// Row Matrix
 		if (Columns == other.Columns && other.Rows == 1) {
-			FMatrixNN Result = FMatrixNN(Rows, Columns);
+			FMatrixNM Result = FMatrixNM(Rows, Columns);
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Columns; col++) {
 					Result.SetValue(row, col, GetValue(row, col) + other.GetValue(0, col));
@@ -209,7 +209,7 @@ public:
 		}
 
 		if (Columns == other.Columns && Rows == 1) {
-			FMatrixNN Result = FMatrixNN(other.Rows, Columns);
+			FMatrixNM Result = FMatrixNM(other.Rows, Columns);
 			for (int row = 0; row < other.Rows; row++) {
 				for (int col = 0; col < Columns; col++) {
 					Result.SetValue(row, col, GetValue(0, col) + other.GetValue(row, col));
@@ -220,16 +220,16 @@ public:
 
 		// Error
 		UE_LOG(LogTemp, Error, TEXT("Invalid Matrix Size. Matrix should be either the same size, column matrix or row matrix."));
-		return FMatrixNN(0, 0);
+		return FMatrixNM(0, 0);
 	}
 
 	// Overload substraction operator
 	// That function seems so bad that I think I'm going blind just looking at it
-	FMatrixNN operator-(const FMatrixNN& other)
+	FMatrixNM operator-(const FMatrixNM& other)
 	{
 		// Full Matrix
 		if (Rows == other.Rows && Columns == other.Columns) {
-			FMatrixNN Result = FMatrixNN(Rows, Columns);
+			FMatrixNM Result = FMatrixNM(Rows, Columns);
 			for (int i = 0; i < Data.Num(); i++) {
 				Result.Data[i] = Data[i] - other.Data[i];
 			}
@@ -238,7 +238,7 @@ public:
 
 		// Column Matrix
 		if (Rows == other.Rows && other.Columns == 1) {
-			FMatrixNN Result = FMatrixNN(Rows, Columns);
+			FMatrixNM Result = FMatrixNM(Rows, Columns);
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Columns; col++) {
 					Result.SetValue(row, col, GetValue(row, col) - other.GetValue(row, 0));
@@ -248,7 +248,7 @@ public:
 		}
 
 		if (Rows == other.Rows && Columns == 1) {
-			FMatrixNN Result = FMatrixNN(Rows, other.Columns);
+			FMatrixNM Result = FMatrixNM(Rows, other.Columns);
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < other.Columns; col++) {
 					Result.SetValue(row, col, GetValue(row, 0) - other.GetValue(row, col));
@@ -259,7 +259,7 @@ public:
 
 		// Row Matrix
 		if (Columns == other.Columns && other.Rows == 1) {
-			FMatrixNN Result = FMatrixNN(Rows, Columns);
+			FMatrixNM Result = FMatrixNM(Rows, Columns);
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Columns; col++) {
 					Result.SetValue(row, col, GetValue(row, col) - other.GetValue(0, col));
@@ -269,7 +269,7 @@ public:
 		}
 
 		if (Columns == other.Columns && Rows == 1) {
-			FMatrixNN Result = FMatrixNN(other.Rows, Columns);
+			FMatrixNM Result = FMatrixNM(other.Rows, Columns);
 			for (int row = 0; row < other.Rows; row++) {
 				for (int col = 0; col < Columns; col++) {
 					Result.SetValue(row, col, GetValue(0, col) - other.GetValue(row, col));
@@ -280,7 +280,7 @@ public:
 
 		// Error
 		UE_LOG(LogTemp, Error, TEXT("Invalid Matrix Size. Matrix should be either the same size, column matrix or row matrix."));
-		return FMatrixNN(0, 0);
+		return FMatrixNM(0, 0);
 	}
 };
 
@@ -288,10 +288,10 @@ class UNeuralNetworkModel
 {
 private:
 	// Array of Matrix of Weights
-	TArray<FMatrixNN> Weights;
+	TArray<FMatrixNM> Weights;
 
 	// Array of Matrix of Bias
-	TArray<FMatrixNN> Bias;
+	TArray<FMatrixNM> Bias;
 
 	// Number of Inputs
 	int InputsNumber = 7;
@@ -316,7 +316,7 @@ public:
 	void InitModel();
 
 	// Run a Forward pass of the Neural Network Model and output the result
-	FMatrixNN RunForwardModel(FMatrixNN Input);
+	FMatrixNM RunForwardModel(FMatrixNM Input);
 
 	// Copy a Neural Network Model
 	void CopyNeuralNetwork(UNeuralNetworkModel* source);

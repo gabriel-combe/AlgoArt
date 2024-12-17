@@ -17,6 +17,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
 	float MutationRate = 0.1f;
 
+	// Evolving Timer between Algo Gen
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
+	float EvolvingTime = 10.f;
+
 	// Actor class to spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACreatures> CreatureActor;

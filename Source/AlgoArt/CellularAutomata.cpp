@@ -49,7 +49,7 @@ void ACellularAutomata::CreateCells()
 
 	for (int y = 0; y < Height; y++) {
 		for (int x = 0; x < Width; x++) {
-			ACell* Cell = GetWorld()->SpawnActor<ACell>(CellClass, FTransform(FRotator::ZeroRotator, FVector(x * SizeCell, y * SizeCell, SizeCell), FVector::OneVector));
+			ACell* Cell = GetWorld()->SpawnActor<ACell>(CellClass, FTransform(FRotator::ZeroRotator, FVector((x - int(Width * 0.5f)) * SizeCell, (y - int(Height * 0.5f)) * SizeCell, SizeCell), FVector::OneVector));
 			
 			if (FMath::FRand() < InitProbaCell)
 				Cell->SetInitState(1);

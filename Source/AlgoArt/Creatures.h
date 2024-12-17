@@ -100,17 +100,17 @@ public:
 	TArray<FJoint> Joints;
 
 	// Create a creature
-	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void CreateCreature();
 
 	// Create a creature from an existing one
 	void CreateCopyCreature(ACreatures* source);
 
 	// Create a creature randomly
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void CreateRandomCreature();
 
 	// Set the Target Point of the Creature
-	UFUNCTION(BlueprintCallable, Category = "Creature")
+	UFUNCTION(BlueprintCallable, Category = "Creatures")
 	void SetTargetPoint(FVector targetpoint);
 
 	// Random Move
@@ -138,7 +138,7 @@ public:
 	void MutateCreature(float mutationrate);
 
 	// Clear the creature
-	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creature")
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "Creatures")
 	void CreatureClear();
 
 };

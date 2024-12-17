@@ -57,7 +57,6 @@ void ACreatures::CreateCreature()
 		CurrentMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 		if (!CurrentIndex) {
-			// RootComponent = CurrentMesh;
 			CreatureMesh[CurrentIndex]->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			CurrentMesh->SetSimulatePhysics(true);
 		}
@@ -168,7 +167,7 @@ void ACreatures::RandomMove()
 // Use the Brain
 void ACreatures::UseBrain()
 {
-	FMatrixNN Input = FMatrixNN(1, 5 + 3 * Joints.Num());
+	FMatrixNM Input = FMatrixNM(1, 5 + 3 * Joints.Num());
 	float Distance = FVector::Dist(CreatureMesh[0]->GetRelativeLocation(), TargetPoint);
 	Distance = FMath::Clamp(Distance, 0.f, 10000.f);
 	Distance /= 10000.f;
@@ -183,7 +182,7 @@ void ACreatures::UseBrain()
 		Input.SetValue(0, index + 1, FMath::Fmod(Joints[(index - 5) / 3].Rotation.Yaw, 360.f) / 360.f);
 	}
 
-	FMatrixNN Output = Brain.RunForwardModel(Input);
+	FMatrixNM Output = Brain.RunForwardModel(Input);
 	// UE_LOG(LogTemp, Warning, TEXT("Output Size %d x %d"), Output.GetRows(), Output.GetColumns());
 
 	for (int index = 0; index < Output.GetColumns(); index = index + 3) {

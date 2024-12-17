@@ -18,10 +18,10 @@ void UNeuralNetworkModel::InitModel()
 
 	int PrevSize = InputsNumber;
 	for (int k : HiddenLayers) {
-		FMatrixNN weight = FMatrixNN(PrevSize, k);
+		FMatrixNM weight = FMatrixNM(PrevSize, k);
 		weight.RandomInit();
 
-		FMatrixNN bias = FMatrixNN(1, k);
+		FMatrixNM bias = FMatrixNM(1, k);
 		bias.RandomInit();
 
 		Weights.Push(weight);
@@ -30,10 +30,10 @@ void UNeuralNetworkModel::InitModel()
 	}
 
 	// Create the Output Layer
-	FMatrixNN weight = FMatrixNN(PrevSize, OutputsNumber);
+	FMatrixNM weight = FMatrixNM(PrevSize, OutputsNumber);
 	weight.RandomInit();
 
-	FMatrixNN bias = FMatrixNN(1, OutputsNumber);
+	FMatrixNM bias = FMatrixNM(1, OutputsNumber);
 	bias.RandomInit();
 
 	Weights.Push(weight);
@@ -41,11 +41,11 @@ void UNeuralNetworkModel::InitModel()
 }
 
 // Run a Forward pass of the Neural Network Model and output the result
-FMatrixNN UNeuralNetworkModel::RunForwardModel(FMatrixNN X)
+FMatrixNM UNeuralNetworkModel::RunForwardModel(FMatrixNM X)
 {
 	if (X.GetColumns() != Weights[0].GetRows()) {
 		UE_LOG(LogTemp, Error, TEXT("Invalid Input Size Missmatch"));
-		return FMatrixNN(0, 0);
+		return FMatrixNM(0, 0);
 	}
 	for (int k = 0; k < Weights.Num(); k++) {
 		X = (X * Weights[k]) + Bias[k];
@@ -85,8 +85,8 @@ void UNeuralNetworkModel::CopyNeuralNetwork(UNeuralNetworkModel* source)
 	Bias.Empty();
 
 	for (int k = 0; k < source->Weights.Num(); k++) {
-		FMatrixNN weight = source->Weights[k];
-		FMatrixNN bias = source->Bias[k];
+		FMatrixNM weight = source->Weights[k];
+		FMatrixNM bias = source->Bias[k];
 
 		Weights.Push(weight);
 		Bias.Push(bias);

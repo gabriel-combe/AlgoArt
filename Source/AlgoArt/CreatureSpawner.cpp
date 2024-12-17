@@ -21,7 +21,7 @@ void ACreatureSpawner::BeginPlay()
 	SpawnCreature();
 
 	FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &ACreatureSpawner::CreatureResampling);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandleResampling, Delegate, 10.f, true, -10.f);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleResampling, Delegate, EvolvingTime, true, -EvolvingTime);
 }
 
 // Called every frame
